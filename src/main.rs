@@ -14,11 +14,25 @@ mod prelude { // use 'mod' to create a new module within the source code
 // use our created prelude within this module's main scope
 use prelude::*;
 
-struct State {}
+struct State {
+    map: Map,
+}
+
+impl State {
+
+    fn new() -> Self {
+        Self {
+            map: Map::new()
+        }
+    }
+}
 
 impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
-        ctx.print_centered(0, "Hello Dungeon Crawler!");
+        ctx.cls(); // clear screen
+
+        // call map's render function
+        self.map.render(ctx);
     }
 }
 
@@ -27,5 +41,5 @@ fn main() -> BError {
         .with_title("Dungeon Crawler")
         .build()?;
 
-    main_loop(context, State{})
+    main_loop(context, State::new())
 }
