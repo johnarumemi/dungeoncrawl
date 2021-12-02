@@ -1,5 +1,6 @@
 mod map; // imports map module and sets up the 'map::' prefix
 mod player;
+mod map_builder;
 
 // 'super::' access the module immediately above your module in the tree
 // 'crate::' access the root of the tree, main.rs
@@ -11,6 +12,7 @@ mod prelude { // use 'mod' to create a new module within the source code
     pub const SCREEN_HEIGHT: i32 = 50;
     pub use crate::map::*;  // use 'crate::' to reference the current module scope and re-export map with 'pub'
     pub use crate::player::*;
+    pub use crate::map_builder::*;
 }
 
 // use our created prelude within this module's main scope
@@ -24,9 +26,15 @@ struct State {
 impl State {
 
     fn new() -> Self {
+        // random number generator for the game
+        let mut rng = RandomNumberGenerator::new();
+
+        // map builder
+        let map_builder = MapBuilder::new(&mut rng);
+
         Self {
-            map: Map::new(),
-            player: Player::new(Point::new(SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
+            map: map_builder.map, // use the generated map from the map builder
+            player: Player::new(map_builder.player_start) //
         }
     }
 }
@@ -48,6 +56,7 @@ impl GameState for State {
 }
 
 fn main() -> BError {
+
     let context = BTermBuilder::simple80x50()
         .with_title("Dungeon Crawler")
         .build()?;
