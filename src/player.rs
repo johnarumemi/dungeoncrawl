@@ -12,12 +12,15 @@ impl Player {
         }
     }
 
-    pub fn render(self: &Self, ctx: &mut BTerm){
-
-        ctx.set(self.position.x, self.position.y, WHITE, BLACK, to_cp437('@'));
+    pub fn render(self: &Self, ctx: &mut BTerm, camera: &Camera){
+        ctx.set_active_console(1); // render on the layer with no background and transparent
+        let relative_x = self.position.x - camera.left_x;
+        let relative_y  = self.position.y - camera.top_y;
+        ctx.set(relative_x, relative_y, WHITE, BLACK, to_cp437('@'));
     }
 
-    pub fn update(self: &mut Self, ctx: &mut BTerm, map: &Map){
+    pub fn update(self: &mut Self, ctx: &mut BTerm, map: &Map, camera: &mut Camera){
+
         if let Some(key) = ctx.key {
 
             let delta = match key {
@@ -37,6 +40,7 @@ impl Player {
 
             if map.can_enter_tile(new_position){
                 self.position = new_position;
+                camera.on_player_move(new_position);
             }
         }
     }

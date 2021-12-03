@@ -1,3 +1,4 @@
+use crate::Camera;
 use crate::prelude::*;
 
 const NUM_TILES: usize = (SCREEN_WIDTH * SCREEN_HEIGHT) as usize;
@@ -30,19 +31,31 @@ impl Map {
         }
     }
 
-    pub fn render(&self, ctx: &mut BTerm){
-        for y in 0..SCREEN_HEIGHT { // outer loop on y index, faster for row-first striding due to memory cache usage
-            for x in 0..SCREEN_WIDTH {
+    pub fn render(&self, ctx: &mut BTerm, camera: &Camera){
 
-                let idx = map_idx(x, y);
+        ctx.set_active_console(0); // render map on the first console with index of 0
 
-                match self.tiles[idx] {
-                    TileType::Floor => {
-                        ctx.set(x, y, YELLOW, BLACK, to_cp437('.'));
-                    },
-                    TileType::Wall => {
-                        ctx.set(x, y, GREEN, BLACK, to_cp437('#'));
-                    },
+        // use camera for rendering the map
+        for y in camera.top_y..camera.bottom_y { // outer loop on y index, faster for row-first striding due to memory cache usage
+            for x in camera.left_x..camera.right_x {
+
+                if self.in_bounds(Point::new(x, y)) { // check that the camera is within map boundary
+
+                    let idx = map_idx(x, y);
+
+                    // screen coordinates shifted by left_x and top_y
+                    // to make them relative to camera
+                    let relative_x = x - camera.left_x;
+                    let relative_y = y - camera.top_y;
+
+                    match self.tiles[idx] {
+                        TileType::Floor => {
+                            ctx.set(relative_x, relative_y, YELLOW, BLACK, to_cp437('.'));
+                        },
+                        TileType::Wall => {
+                            ctx.set(relative_x, relative_y, GREEN, BLACK, to_cp437('#'));
+                        },
+                    }
                 }
             }
         }
