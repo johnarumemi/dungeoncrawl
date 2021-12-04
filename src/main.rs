@@ -8,6 +8,7 @@ mod map_builder;
 // Create our own prelude that others can use
 mod prelude { // use 'mod' to create a new module within the source code
     pub use bracket_lib::prelude::*; // re-export it
+    pub use legion::*;
     pub const SCREEN_WIDTH: i32 = 80;
     pub const SCREEN_HEIGHT: i32 = 50;
     pub use crate::map::*;  // use 'crate::' to reference the current module scope and re-export map with 'pub'
