@@ -12,7 +12,6 @@ mod prelude { // use 'mod' to create a new module within the source code
     pub const SCREEN_WIDTH: i32 = 80;
     pub const SCREEN_HEIGHT: i32 = 50;
     pub use crate::map::*;  // use 'crate::' to reference the current module scope and re-export map with 'pub'
-    pub use crate::player::*;
     pub use crate::map_builder::*;
 }
 
@@ -21,7 +20,6 @@ use prelude::*;
 
 struct State {
     map: Map,
-    player: Player
 }
 
 impl State {
