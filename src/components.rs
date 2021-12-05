@@ -8,3 +8,6 @@ pub struct Render { // describes appearance of the entity
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Player; // this component struct is essentially a 'tag'
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Enemy;
