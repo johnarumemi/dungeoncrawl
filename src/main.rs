@@ -1,8 +1,10 @@
+mod state;
 mod camera;
 mod components;
 mod map; // imports map module and sets up the 'map::' prefix
 mod map_builder;
 mod spawner;
+mod turn_state;
 
 mod systems;
 
@@ -15,9 +17,11 @@ mod prelude {
     pub use bracket_lib::prelude::*; // re-export it
     pub use legion::*;
 
+    pub use crate::state::*;
     pub use crate::components::*;
     pub use crate::spawner::*;
     pub use crate::systems::*;
+    pub use crate::turn_state::*;
 
     pub use crate::camera::*;
     pub use crate::map::*; // use 'crate::' to reference the current module scope and re-export map with 'pub'
@@ -32,68 +36,7 @@ mod prelude {
 }
 
 // use our created prelude within this module's main scope
-use crate::camera::Camera;
 use prelude::*;
-
-struct State {
-    ecs: World,           // use by Legion for storing all entities and components
-    resources: Resources, // shared data between systems
-    systems: Schedule,    // holds systems
-}
-
-impl State {
-    fn new() -> Self {
-        let mut ecs = World::default();
-        let mut resources = Resources::default(); // list of resources
-
-        // random number generator for the game
-        let mut rng = RandomNumberGenerator::new();
-
-        // map builder
-        let map_builder = MapBuilder::new(&mut rng);
-
-        // spawn player entity and add to ecs/World
-        spawn_player(&mut ecs, map_builder.player_start);
-
-        // spawn monsters
-        map_builder.rooms
-            .iter()
-            .skip(1)
-            .map(|r| r.center())
-            .for_each(|pos| spawn_monster(&mut ecs, &mut rng, pos));
-
-        // Add camera and generated map to list of resources
-        resources.insert(map_builder.map);
-        resources.insert(Camera::new(map_builder.player_start));
-
-        Self {
-            ecs,
-            resources,
-            systems: build_scheduler(),
-        }
-    }
-}
-
-impl GameState for State {
-    fn tick(&mut self, ctx: &mut BTerm) {
-        // clear screen and layers
-        ctx.set_active_console(0);
-        ctx.cls();
-
-        ctx.set_active_console(1);
-        ctx.cls();
-
-        // when we add a resource of the same type, it replaces previous resource of same type
-        // hence the below insert will not result in duplicate resources
-        self.resources.insert(ctx.key);
-
-        // execute the Schedule to run the various systems
-        // Schedule requires access to the World (entities & components) and resources (shared data)
-        self.systems.execute(&mut self.ecs, &mut self.resources);
-
-        render_draw_buffer(ctx).expect("Render error");
-    }
-}
 
 fn main() -> BError {
     let context = BTermBuilder::new() // create generic terminal
