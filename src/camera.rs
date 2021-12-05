@@ -1,6 +1,5 @@
 use crate::prelude::*;
 
-
 // create camera and update it when player moves
 pub struct Camera {
     pub left_x: i32,
@@ -10,7 +9,6 @@ pub struct Camera {
 }
 
 impl Camera {
-
     pub fn new(player_position: Point) -> Self {
         // center camera on player position
         let mut camera = Camera {
@@ -29,11 +27,10 @@ impl Camera {
         self.set_position(player_position);
     }
 
-    fn set_position(&mut self, point: Point){
+    fn set_position(&mut self, point: Point) {
         self.left_x = point.x - DISPLAY_WIDTH / 2;
         self.right_x = point.x + DISPLAY_WIDTH / 2;
         self.top_y = point.y - DISPLAY_HEIGHT / 2;
         self.bottom_y = point.y + DISPLAY_HEIGHT / 2;
     }
 }
-
