@@ -12,7 +12,7 @@ pub fn map_render(
     draw_batch.target(0);
 
     // use camera for rendering the map
-    for y in camera.top_y..camera.bottom_y {
+    for y in camera.top_y..=camera.bottom_y {
         // outer loop on y index, faster for row-first striding due to memory cache usage
         for x in camera.left_x..camera.right_x {
 

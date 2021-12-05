@@ -1,15 +1,16 @@
+use legion::systems::CommandBuffer;
 // nested module inside the 'systems' module
 use crate::prelude::*;
 
 // use procedural macro to inject boilerplate ... similar to a decorator
 #[system]  // legion macro
-#[write_component(Point)] // request write access to a component type i.e. Point
-#[write_component(Player)] // request read access to Player component
+#[read_component(Point)] // request write access to a component type i.e. Point
+#[read_component(Player)] // request read access to Player component
 pub fn player_input(
     ecs: &mut legion::world::SubWorld, // a SubWorld can only see components that were requested
-    #[resource] map: &Map,
+    commands: &mut CommandBuffer,
     #[resource] key: &Option<VirtualKeyCode>,
-    #[resource] camera: &mut Camera // note that this is mutable
+    #[resource] turn_state: &mut TurnState
 ){
     if let Some(key) = key {
         // get requested movement
@@ -29,20 +30,28 @@ pub fn player_input(
         // query SubWorld for player
         if delta.x != 0 || delta.y != 0 {
             // use <&mut Point> to ensure query returns a mutable reference to the components for entities
-            let mut players = <&mut Point>::query()
+            let mut players = <(Entity, &Point)>::query()
                 .filter(component::<Player>()); // the query output won't actually contain the Player component's data though
 
             // The query does not become an iterator until you call iter or iter_mut on it
             // hence using .filter() does not change the query to an iterator but rather returns a query
             // use iter_mut to obtain a mutable iterator
-            players.iter_mut(ecs).for_each(|pos| {
+            players.iter(ecs).for_each(|(entity, pos)| {
                 // use *pos to get actual value being referenced (dereference)
                 let destination = *pos + delta;
+                /*
+                 NOTE: there is no check anymore to see if destination is a valid tile move
+                 before ending the players turn
+                 */
 
-                if map.can_enter_tile(destination){
-                    *pos = destination; // update Point's value
-                    camera.on_player_move(destination);
-                }
+                /*
+                 emit WantsToMove message
+                 push does not support singular components, hence the use of the () as a component
+                 */
+                commands.push( ( (), WantsToMove{ entity: *entity, destination}) );
+
+                // update turn state
+                *turn_state = TurnState::PlayerTurn;
             })
         }
     }
