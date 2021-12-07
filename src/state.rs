@@ -58,6 +58,9 @@ impl GameState for State {
         ctx.set_active_console(1);
         ctx.cls();
 
+        ctx.set_active_console(2);
+        ctx.cls();
+        
         // when we add a resource of the same type, it replaces previous resource of same type
         // hence the below insert will not result in duplicate resources
         self.resources.insert(ctx.key);

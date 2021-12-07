@@ -24,3 +24,10 @@ pub struct WantsToMove { // this component contains data via its fields, we are 
     pub entity : Entity, // store reference to an entity inside Legion
     pub destination: Point
 }
+
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct Health {
+    pub current: i32,
+    pub max: i32
+}
+
