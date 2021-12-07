@@ -11,7 +11,9 @@ mod systems;
 // 'super::' access the module immediately above your module in the tree
 // 'crate::' access the root of the tree, main.rs
 
-// Create our own prelude that others can use
+/*
+Create an inline module rather than one defined in a .rs file
+ */
 mod prelude {
     // use 'mod' to create a new module within the source code
     pub use bracket_lib::prelude::*; // re-export it
