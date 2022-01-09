@@ -26,7 +26,7 @@ impl State {
         // spawn player entity and add to ecs/World
         spawn_player(&mut ecs, map_builder.player_start);
 
-        // spawn monsters
+        // spawn monsters for each room
         map_builder.rooms
             .iter()
             .skip(1)
@@ -36,7 +36,6 @@ impl State {
         // Add camera and generated map to list of resources
         resources.insert(map_builder.map);
         resources.insert(Camera::new(map_builder.player_start));
-
         resources.insert(TurnState::AwaitingInput);
 
         Self {
@@ -62,8 +61,14 @@ impl GameState for State {
         ctx.cls();
         
         // when we add a resource of the same type, it replaces previous resource of same type
-        // hence the below insert will not result in duplicate resources
+        // hence the below insert(s) will not result in duplicate resources
+        // note that ctx.key is of type Option<VirtualKeyCode>
         self.resources.insert(ctx.key);
+
+        // mouse pos is in terminal coordinates
+        // call set_activate_console first so ensure we receive mouse coordinates for correct layer
+        ctx.set_active_console(0);
+        self.resources.insert(Point::from_tuple(ctx.mouse_pos()));
 
         // execute the Schedule to run the various systems
         // Schedule requires access to the World (entities & components) and resources (shared data)
@@ -74,6 +79,7 @@ impl GameState for State {
         // use .clone() to duplicate the state, ensures resource is no longer borrowed
         let current_state: TurnState  = self.resources.get::<TurnState>().unwrap().clone();
 
+        // execute specific system depending on current state
         match current_state {
             TurnState::AwaitingInput => self.input_systems.execute(&mut self.ecs, &mut self.resources),
             TurnState::PlayerTurn => self.player_systems.execute(&mut self.ecs, &mut self.resources),

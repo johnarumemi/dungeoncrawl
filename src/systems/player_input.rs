@@ -1,4 +1,6 @@
 use legion::systems::CommandBuffer;
+use legion::world::SubWorld;
+
 // nested module inside the 'systems' module
 use crate::prelude::*;
 
@@ -7,7 +9,7 @@ use crate::prelude::*;
 #[read_component(Point)] // request write access to a component type i.e. Point
 #[read_component(Player)] // request read access to Player component
 pub fn player_input(
-    ecs: &mut legion::world::SubWorld, // a SubWorld can only see components that were requested
+    ecs: &mut SubWorld, // a SubWorld can only see components that were requested
     commands: &mut CommandBuffer,
     #[resource] key: &Option<VirtualKeyCode>,
     #[resource] turn_state: &mut TurnState

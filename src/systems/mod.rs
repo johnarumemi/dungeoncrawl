@@ -5,7 +5,8 @@ mod collisions;
 mod random_move;
 mod end_turn;
 mod movement;
-mod  hud;
+mod hud;
+mod tooltips;
 
 use crate::prelude::*;
 
@@ -24,6 +25,7 @@ pub fn build_input_scheduler() -> Schedule {
         .add_system(map_render::map_render_system())
         .add_system(entity_render::entity_render_system())
         .add_system(hud::hud_system())
+        .add_system(tooltips::tooltips_system())
         .build()
 }
 

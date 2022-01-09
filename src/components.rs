@@ -31,3 +31,6 @@ pub struct Health {
     pub max: i32
 }
 
+#[derive(Clone, PartialEq)]
+pub struct Name(pub String);
+// instance.0 contains the string

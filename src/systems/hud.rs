@@ -12,12 +12,12 @@ pub fn hud(ecs: &SubWorld){
     let player_health = health_query
         .iter(ecs ) // immutable
         .nth(0 )// get the 0th iterable
-        .unwrap(); // unwrap Option
+        .unwrap(); // unwrap Option, panic if None variant found
 
     let mut draw_batch = DrawBatch::new();
 
-    draw_batch.target(2); // target 2nd console
-    draw_batch.print_centered(1, "Explore the Dungeon. Cursor or WASD keys to move."    );
+    draw_batch.target(2); // target 2nd console, the HUD console
+    draw_batch.print_centered(1, "Explore the Dungeon. Cursor or WASD keys to move.");
     draw_batch.bar_horizontal(
         Point::zero(),
         SCREEN_WIDTH * 2,
