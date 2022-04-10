@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-// create camera and update it when player moves
+/// Camera whose bounds  define the visible secion of the map
 pub struct Camera {
     pub left_x: i32,
     pub right_x: i32,
@@ -9,6 +9,7 @@ pub struct Camera {
 }
 
 impl Camera {
+    /// Create new camera centered on player position
     pub fn new(player_position: Point) -> Self {
         // center camera on player position
         let mut camera = Camera {
@@ -23,10 +24,12 @@ impl Camera {
         camera
     }
 
+    /// function to be called on player move with player's new position
     pub fn on_player_move(self: &mut Self, player_position: Point) {
         self.set_position(player_position);
     }
 
+    /// Update camera boundary
     fn set_position(&mut self, point: Point) {
         self.left_x = point.x - DISPLAY_WIDTH / 2;
         self.right_x = point.x + DISPLAY_WIDTH / 2;

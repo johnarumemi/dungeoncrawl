@@ -1,3 +1,5 @@
+#![warn(clippy::all, clippy::pedantic)]
+
 mod state;
 mod camera;
 mod components;
@@ -14,21 +16,25 @@ mod systems;
 /*
 Create an inline module rather than one defined in a .rs file
  */
+
+/// all publicly accessible components of the application
 mod prelude {
-    // use 'mod' to create a new module within the source code
-    pub use bracket_lib::prelude::*; // re-export it
+    pub use bracket_lib::prelude::*;
     pub use legion::*;
+    pub use legion::world::SubWorld;
+    pub use legion::systems::CommandBuffer;
 
-    pub use crate::state::*;
-    pub use crate::components::*;
-    pub use crate::spawner::*;
-    pub use crate::systems::*;
-    pub use crate::turn_state::*;
+    pub use super::state::*;
+    pub use super::components::*;
+    pub use super::spawner::*;
+    pub use super::systems::*;
+    pub use super::turn_state::*;
 
-    pub use crate::camera::*;
-    pub use crate::map::*; // use 'crate::' to reference the current module scope and re-export map with 'pub'
-    pub use crate::map_builder::*;
+    pub use super::camera::*;
+    pub use super::map::*;
+    pub use super::map_builder::*;
 
+    // world units size
     pub const SCREEN_WIDTH: i32 = 80;
     pub const SCREEN_HEIGHT: i32 = 50;
 

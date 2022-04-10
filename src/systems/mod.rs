@@ -1,3 +1,16 @@
+//! Systems can run concurrently and are managed by a Scheduler
+//!
+//! Legion builds a schedule by examining the systems you give it
+//! and determines data dependency between them.
+//! Many systems can read data at once, but only a single
+//! system can safely write to it at any given time.
+//! The order you also present systems is considered.
+//!
+//! Legion will run systems in the order they are presented unless
+//! they can be grouped together and run concurrently.
+//!
+//! This module contains builder functions to create
+//! a separate Scheduler for each input state
 mod player_input; // accessible via player_input::*
 mod map_render;
 mod entity_render;
@@ -10,13 +23,11 @@ mod tooltips;
 
 use crate::prelude::*;
 
-// uses builder pattern to build a Schedule - an execution play for our systems
-// when a system executes commands they don't take effect immediately, a hidden flush
-// at end tells Legion to apply changes, we can manually call this ourselves with 'flush()'
-
-// separate scheduler for each input state
-
+/// uses builder pattern to build a Schedule - an execution play for our systems.
 pub fn build_input_scheduler() -> Schedule {
+    // when a system executes commands they don't take effect immediately, a hidden flush
+    // at end tells Legion to apply changes, we can manually call this ourselves with 'flush()'.
+
     // while awaiting input the screen still needs to display the map and entities
     // also calls the player_input system
     Schedule::builder()
@@ -49,7 +60,7 @@ pub fn build_monster_scheduler() -> Schedule {
     // during monster turn, collisions are modelled and everything is rendered + monsters move randomly
     Schedule::builder()
         .add_system(movement::movement_system())
-        .flush() // apply changes in it command buffer from movement system
+        .flush() // apply changes in command buffer from movement system
         .add_system(random_move::random_move_system()) // move is placed before collision system
         .flush()
         .add_system(collisions::collisions_system())

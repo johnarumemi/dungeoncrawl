@@ -1,5 +1,5 @@
+//! Game state and tick function
 use crate::prelude::*;
-
 
 
 pub struct State {
@@ -66,7 +66,7 @@ impl GameState for State {
         self.resources.insert(ctx.key);
 
         // mouse pos is in terminal coordinates
-        // call set_activate_console first so ensure we receive mouse coordinates for correct layer
+        // call set_activate_console first to ensure we receive mouse coordinates for correct layer
         ctx.set_active_console(0);
         self.resources.insert(Point::from_tuple(ctx.mouse_pos()));
 

@@ -1,7 +1,3 @@
-use legion::systems::CommandBuffer;
-use legion::world::SubWorld;
-
-// nested module inside the 'systems' module
 use crate::prelude::*;
 
 // use procedural macro to inject boilerplate ... similar to a decorator
@@ -11,8 +7,8 @@ use crate::prelude::*;
 pub fn player_input(
     ecs: &mut SubWorld, // a SubWorld can only see components that were requested
     commands: &mut CommandBuffer,
-    #[resource] key: &Option<VirtualKeyCode>,
-    #[resource] turn_state: &mut TurnState
+    #[resource] key: &Option<VirtualKeyCode>,  // request immutable reference to resource
+    #[resource] turn_state: &mut TurnState  // request mutable reference to resource
 ){
     if let Some(key) = key {
         // get requested movement
@@ -36,7 +32,7 @@ pub fn player_input(
                 .filter(component::<Player>()); // the query output won't actually contain the Player component's data though
 
             // The query does not become an iterator until you call iter or iter_mut on it
-            // hence using .filter() does not change the query to an iterator but rather returns a query
+            // hence using .filter() does not change the query to an iterator but rather returns a query.
             // use iter_mut to obtain a mutable iterator
             players.iter(ecs).for_each(|(entity, pos)| {
                 // use *pos to get actual value being referenced (dereference)
@@ -48,11 +44,16 @@ pub fn player_input(
 
                 /*
                  emit WantsToMove message
-                 push does not support singular components, hence the use of the () as a component
+                 messages can be treated as their own entity
+                 push does not support singular components / entities of only 1 component,
+                 hence the use of the '()' as a component
+
+                 Note that entity derives Copy, hence *entity will not move Entity into
+                 the WantsToMove struct, but rather creates a copy
                  */
                 commands.push( ( (), WantsToMove{ entity: *entity, destination}) );
 
-                // update turn state
+                // update turn state: move to next state
                 *turn_state = TurnState::PlayerTurn;
             })
         }

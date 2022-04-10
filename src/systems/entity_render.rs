@@ -16,7 +16,8 @@ pub fn entity_render(ecs: &SubWorld, #[resource] camera: &Camera){
     // use camera to determine offset to apply to entity's screen position
     <(&Point, &Render)>::query() // generate query
         .iter(ecs) // transform query into an iterator
-        .for_each(|(pos, render)| { // loop over grouped components for each matched entity
+        .for_each(|(pos, render)| { // destructure tuple of components from query iterator
+            // loop over grouped components for each matched entity
             draw_batch.set(
                 *pos - offset,
                 render.color,
@@ -24,6 +25,6 @@ pub fn entity_render(ecs: &SubWorld, #[resource] camera: &Camera){
             );
     });
 
-    // 5000 is used as a sort order because the map may include 400 elements.
+    // 5000 is used as a sort order because the map may include 4000 elements.
     draw_batch.submit(5000).expect("Batch render entity error");
 }

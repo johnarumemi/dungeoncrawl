@@ -1,8 +1,11 @@
-// This module handles spawning entities
+//! This module handles spawning entities
 use crate::prelude::*;
 
+/// Spawn player into World at provided position
 pub fn spawn_player(ecs: &mut World, pos: Point) {
-    // calling push creates an entity composed of the listed components
+
+    // calling push creates an entity composed of the
+    // listed components and adds it to the world
     ecs.push((
         Player,
         pos, // Legion can accept most types as components, so we use a structure from bracket-lib to represent a Point / Position component
@@ -28,7 +31,7 @@ pub fn spawn_monster(ecs: &mut World, rng: &mut RandomNumberGenerator, pos: Poin
         _ => ettin()
     };
 
-    // add tuple of components the describe the monster entity
+    // add tuple of components that describe the monster entity
     ecs.push((
         Enemy,
         pos, // note that post ownership is moved into the ECS
@@ -42,20 +45,26 @@ pub fn spawn_monster(ecs: &mut World, rng: &mut RandomNumberGenerator, pos: Poin
         ));
 }
 
+/// Create tuple of components that describe a goblin
 fn goblin() -> (i32, String, FontCharType) {
     // hit points, name and reference to an ASCII character
     (1, "Goblin".to_string(), to_cp437('g'))
 }
 
+/// Create tuple of components that describe an orc
 fn orc() -> (i32, String, FontCharType) {
     // hit points, name and reference to an ASCII character
     (2, "Orc".to_string(), to_cp437('o'))
 }
 
+
+/// Create tuple of components that describe an ogre
 fn ogre() -> (i32, String, FontCharType) {
     (3, "Ogre".to_string(), to_cp437('O'))
 }
 
+
+/// Create tuple of components that describe an ettin
 fn ettin() -> (i32, String, FontCharType) {
     // note that the 2 below is a literal, hence has Copy trait defined
     (3, "Ettin".to_string(), to_cp437('E'))

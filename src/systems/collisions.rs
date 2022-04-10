@@ -2,6 +2,12 @@ use legion::systems::CommandBuffer;
 use legion::world::SubWorld;
 use crate::prelude::*;
 
+///
+///
+/// # Notes
+/// CommandBuffer is a special container added by Legion, to allow you
+/// to insert instructions for Legion to execute after the system has been run
+///
 #[system]
 #[read_component(Point)]
 #[read_component(Player)]
@@ -15,6 +21,7 @@ pub fn collisions(ecs: &SubWorld, commands: &mut CommandBuffer){
     <&Point>::query()
         .filter(component::<Player>()) // this is a query filter, not an iterator filter function
         .iter(ecs)
+        // note that closure has content 'moved' into it.
         .for_each(|pos| player_pos = *pos);
 
     // find monsters
@@ -24,8 +31,10 @@ pub fn collisions(ecs: &SubWorld, commands: &mut CommandBuffer){
         .filter(component::<Enemy>())
         .iter(ecs)
         // filter for only entities that match players position
-        // by the time pos reaches filter it has type of &&Point, so need **pos to dereference it
-        // it entered query as a reference and iterator referenced it again
+        // filter iterates over references to its contents.
+        // Hence, by the time pos reaches filter it has type of &&Point,
+        // so need **pos to dereference it
+        // Overall, it entered query as a reference and 'filter' referenced it again
         .filter(|(_, pos)| **pos == player_pos)
         // iterator referenced entity, so it has type of &Entity by now
         // hence use *entity to get value of borrowed entity

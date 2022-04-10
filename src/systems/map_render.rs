@@ -49,5 +49,5 @@ pub fn map_render(
     // submitting the batch adds it to the global command list. Integer parameter
     // acts as a sort order. 0 renders first, ensuring that your map is drawn at the
     // beginning of the render cycle
-    draw_batch.submit(0     ).expect("Batch draw error");
+    draw_batch.submit(0     ).expect("Batch draw error in rendering map");
 }

@@ -8,8 +8,11 @@ pub struct MapBuilder {
     pub player_start: Point,
 }
 
+/// Builder for Map struct
 impl MapBuilder {
+
     pub fn new(rng: &mut RandomNumberGenerator) -> Self {
+
         let mut mb = MapBuilder {
             map: Map::new(),
             rooms: Vec::new(),
@@ -25,6 +28,7 @@ impl MapBuilder {
         mb
     }
 
+    /// Fill stored map with a single TileType
     fn fill(self: &mut Self, tile: TileType) {
         // 1. obtain a mutable iterator
         // 2. use for_each to change every tile into a wall (or whatever arg is passed into 'tile')
@@ -32,9 +36,12 @@ impl MapBuilder {
         self.map.tiles.iter_mut().for_each(|t| *t = tile);
     }
 
+    /// Generate rooms of random size and location
+    ///
+    /// # Note
+    /// Uses same random number generator throughout map generation
+    /// to ensure that for a given seed  it generates the same map
     fn build_random_rooms(&mut self, rng: &mut RandomNumberGenerator) {
-        // use same random number generator throughout map generation to ensure that
-        // for a given seed you get the same map
 
         while self.rooms.len() < NUM_ROOMS {
             // keep generating rooms until there are NUM_ROOMS on the map
@@ -59,6 +66,10 @@ impl MapBuilder {
             // if room does not overlap check that all its points are within map boundaries
             // and set each tile to 'floor'
             if !overlap {
+
+                // NOTE: It seems a 'valid room' can still have
+                // some points that are outside of the map?
+
                 room.for_each(|p| {
                     // iterate over every Point within the room
                     if p.x > 0 && p.x < SCREEN_WIDTH && p.y > 0 && p.y < SCREEN_HEIGHT {
@@ -68,28 +79,6 @@ impl MapBuilder {
                 });
 
                 self.rooms.push(room)
-            }
-        }
-    }
-
-    fn apply_vertical_tunnel(&mut self, y1: i32, y2: i32, x: i32) {
-        use std::cmp::{max, min}; // bring min and max into scope
-
-        // range iterators expect starting value to be minimum and end value to be maximum
-        // iterate from start to end of corridor and change tile to 'Floor'
-        for y in min(y1, y2)..=max(y1, y2) {
-            if let Some(idx) = self.map.try_idx(Point::new(x, y)) {
-                self.map.tiles[idx as usize] = TileType::Floor;
-            }
-        }
-    }
-
-    fn apply_horizontal_tunnel(&mut self, x1: i32, x2: i32, y: i32) {
-        use std::cmp::{max, min};
-
-        for x in min(x1, x2)..=max(x1, x2) {
-            if let Some(idx) = self.map.try_idx(Point::new(x, y)) {
-                self.map.tiles[idx as usize] = TileType::Floor;
             }
         }
     }
@@ -109,12 +98,35 @@ impl MapBuilder {
 
             // randomly dig the horizontal then vertical corridors or vice versa
             if rng.range(0, 2) == 1 {
-                self.apply_horizontal_tunnel(prev.x, current.x, prev.y);
-                self.apply_vertical_tunnel(prev.y, current.y, current.x);
+                self.generate_horizontal_tunnel(prev.x, current.x, prev.y);
+                self.generate_vertical_tunnel(prev.y, current.y, current.x);
             } else {
-                self.apply_vertical_tunnel(prev.y, current.y, prev.x);
-                self.apply_horizontal_tunnel(prev.x, current.x, current.y);
+                self.generate_vertical_tunnel(prev.y, current.y, prev.x);
+                self.generate_horizontal_tunnel(prev.x, current.x, current.y);
             }
         }
     }
+
+    fn generate_vertical_tunnel(&mut self, y1: i32, y2: i32, x: i32) {
+        use std::cmp::{max, min}; // bring min and max into scope
+
+        // range iterators expect starting value to be minimum and end value to be maximum
+        // iterate from start to end of corridor and change tile to 'Floor'
+        for y in min(y1, y2)..=max(y1, y2) {
+            if let Some(idx) = self.map.try_idx(Point::new(x, y)) {
+                self.map.tiles[idx] = TileType::Floor;
+            }
+        }
+    }
+
+    fn generate_horizontal_tunnel(&mut self, x1: i32, x2: i32, y: i32) {
+        use std::cmp::{max, min};
+
+        for x in min(x1, x2)..=max(x1, x2) {
+            if let Some(idx) = self.map.try_idx(Point::new(x, y)) {
+                self.map.tiles[idx] = TileType::Floor;
+            }
+        }
+    }
+
 }
